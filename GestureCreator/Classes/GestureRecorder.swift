@@ -10,26 +10,55 @@ import Foundation
 import CoreGraphics
 
 class GestureRecorder {
-    var gesture = [(CGPoint, Double)]()
-    var gestureBeginTime: NSTimeInterval?
+    typealias GestureSample = [(CGPoint, NSTimeInterval)]
+    typealias GestureCollection = [GestureSample]
+    
+    let gestureName: String?
+    private var gestureBeginTime: NSTimeInterval?
+    private var gestureSample = GestureSample()
+    private var gestureData = GestureCollection()
+    
+    init(name: String) {
+        gestureName = name
+    }
+    
+    var gestureSamplesCount: Int {
+        get {
+            return gestureData.count
+        }
+    }
+    
+    class func clear() {
+        // TODO remove file
+    }
+    
+    func save() {
+        println("saving to file")
+    }
+    
+    func undoLastGesture() {
+        if (self.gestureData.count > 0) {
+            self.gestureData.removeLast()
+        }
+    }
     
     func beginStrokeAtPoint(point: CGPoint, timestamp: NSTimeInterval) {
         gestureBeginTime = gestureBeginTime ?? timestamp // set begin time if it was unsetted
-        
-        var timeDifference = timestamp - gestureBeginTime!        
-        gesture.append((point, timeDifference))
+        let timeDifference = timestamp - gestureBeginTime!
+        gestureSample.append((point, timeDifference))
         println("Begin at point: \(point) at \(timestamp). Diff = \(timeDifference)")
     }
     
     func continueStrokeWithPoint(point: CGPoint, timestamp: NSTimeInterval) {
         let timeDifference = timestamp - gestureBeginTime!
-        gesture.append((point, timeDifference))
+        gestureSample.append((point, timeDifference))
         println("Conti at point: \(point) at \(timestamp). Diff = \(timeDifference)")
     }
     
     func completeGesture() {
-        println("stop recording. Writing to file...")
-        gesture.removeAll(keepCapacity: true)
+        println("gesture created")
+        gestureData.append(gestureSample)
+        gestureSample.removeAll(keepCapacity: false)
         gestureBeginTime = nil
     }
 }
