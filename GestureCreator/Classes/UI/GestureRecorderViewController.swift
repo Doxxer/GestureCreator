@@ -41,7 +41,10 @@ class GestureRecorderViewController: UIViewController {
     }
     
     @IBAction func share(sender: UIBarButtonItem) {
-        // TODO
+        if let file = GestureRecorder.dataFileURL {
+            let activityViewController = UIActivityViewController(activityItems: ["ololo", file], applicationActivities: nil)
+            self.presentViewController(activityViewController, animated: true, completion: nil)
+        }
     }
     
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {

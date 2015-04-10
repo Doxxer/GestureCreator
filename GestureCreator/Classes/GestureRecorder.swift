@@ -17,6 +17,9 @@ class GestureRecorder {
     private var gestureBeginTime: NSTimeInterval?
     private var gestureSample = GestureSample()
     private var gestureData = GestureCollection()
+    private static let dataFileName = "data.txt"
+    
+    static var dataFileURL: NSURL? = GestureRecorder.createDataFile(replace: false)
     
     init(name: String) {
         gestureName = name
@@ -36,11 +39,13 @@ class GestureRecorder {
         let fileManager = NSFileManager.defaultManager()
         
         if let cacheDirectory: String = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true).last as? String,
-            let fileURL: NSURL = NSURL(fileURLWithPath: cacheDirectory, isDirectory: true)?.URLByAppendingPathComponent("data.txt")
+            let fileURL: NSURL = NSURL(fileURLWithPath: cacheDirectory, isDirectory: true)?.URLByAppendingPathComponent(dataFileName)
         {
             if (replace || !NSFileManager.defaultManager().fileExistsAtPath(fileURL.path!)) {
                 NSFileManager.defaultManager().createFileAtPath(fileURL.path!, contents: nil, attributes: nil)
             }
+            
+            println("created file: \(fileURL.path!)")
             return fileURL
         }
         
@@ -48,12 +53,11 @@ class GestureRecorder {
     }
     
     func save() {
-        let fileManager = NSFileManager.defaultManager()
-        if let fileURL = self.dynamicType.createDataFile(replace: false) {
-            let s = gestureData.reduce("") { (stringRepresentation, gestureSample) in
+        if let fileURL = GestureRecorder.dataFileURL {
+            let gestureDataInString = gestureData.reduce("") { (stringRepresentation, gestureSample) in
                 return "\(stringRepresentation){\(gestureName)} : \(gestureSample.description)\n"
             }            
-            s.writeToURL(fileURL, atomically: false, encoding: NSUTF8StringEncoding, error: nil)
+            gestureDataInString.writeToURL(fileURL, atomically: false, encoding: NSUTF8StringEncoding, error: nil)
         }
     }
     
@@ -67,17 +71,14 @@ class GestureRecorder {
         gestureBeginTime = gestureBeginTime ?? timestamp // set begin time if it was unsetted
         let timeDifference = timestamp - gestureBeginTime!
         gestureSample.append((point, timeDifference))
-        println("Begin at point: \(point) at \(timestamp). Diff = \(timeDifference)")
     }
     
     func continueStrokeWithPoint(point: CGPoint, timestamp: NSTimeInterval) {
         let timeDifference = timestamp - gestureBeginTime!
         gestureSample.append((point, timeDifference))
-        println("Conti at point: \(point) at \(timestamp). Diff = \(timeDifference)")
     }
     
     func completeGesture() {
-        println("gesture created")
         gestureData.append(gestureSample)
         gestureSample.removeAll(keepCapacity: false)
         gestureBeginTime = nil
