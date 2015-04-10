@@ -42,7 +42,7 @@ class GestureRecorderViewController: UIViewController {
     
     @IBAction func share(sender: UIBarButtonItem) {
         if let file = GestureRecorder.dataFileURL {
-            let activityViewController = UIActivityViewController(activityItems: ["ololo", file], applicationActivities: nil)
+            let activityViewController = UIActivityViewController(activityItems: [file], applicationActivities: nil)
             self.presentViewController(activityViewController, animated: true, completion: nil)
         }
     }

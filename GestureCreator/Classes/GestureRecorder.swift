@@ -19,7 +19,9 @@ class GestureRecorder {
     private var gestureData = GestureCollection()
     private static let dataFileName = "data.txt"
     
-    static var dataFileURL: NSURL? = GestureRecorder.createDataFile(replace: false)
+    static var dataFileURL: NSURL? {
+        return GestureRecorder.createDataFile(replace: false)
+    }
     
     init(name: String) {
         gestureName = name
@@ -35,17 +37,16 @@ class GestureRecorder {
         createDataFile(replace: true)
     }
     
-    private class func createDataFile(#replace: Bool) -> NSURL? {
-        let fileManager = NSFileManager.defaultManager()
-        
+    private class func createDataFile(replace: Bool = false) -> NSURL? {
         if let cacheDirectory: String = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true).last as? String,
             let fileURL: NSURL = NSURL(fileURLWithPath: cacheDirectory, isDirectory: true)?.URLByAppendingPathComponent(dataFileName)
         {
             if (replace || !NSFileManager.defaultManager().fileExistsAtPath(fileURL.path!)) {
                 NSFileManager.defaultManager().createFileAtPath(fileURL.path!, contents: nil, attributes: nil)
+                println("created file: \(fileURL.path!)")
+            } else {
+                println("file found at: \(fileURL.path!)")
             }
-            
-            println("created file: \(fileURL.path!)")
             return fileURL
         }
         
@@ -53,11 +54,18 @@ class GestureRecorder {
     }
     
     func save() {
-        if let fileURL = GestureRecorder.dataFileURL {
-            let gestureDataInString = gestureData.reduce("") { (stringRepresentation, gestureSample) in
-                return "\(stringRepresentation){\(gestureName)} : \(gestureSample.description)\n"
-            }            
-            gestureDataInString.writeToURL(fileURL, atomically: false, encoding: NSUTF8StringEncoding, error: nil)
+        
+        let gestureDataInString = gestureData.reduce("") { (stringRepresentation, gestureSample) in
+            return "\(stringRepresentation){\(gestureName)} : \(gestureSample.description)\n"
+        }
+        
+        if let fileURL = GestureRecorder.dataFileURL,
+            let fileHandler = NSFileHandle(forUpdatingURL: fileURL, error: nil),
+            let data = gestureDataInString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) {
+                println("saving \(gestureName)...")
+                fileHandler.seekToEndOfFile()
+                fileHandler.writeData(gestureDataInString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
+                fileHandler.closeFile()
         }
     }
     
