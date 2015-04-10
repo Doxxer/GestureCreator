@@ -13,7 +13,7 @@ class GestureRecorder {
     typealias GestureSample = [(CGPoint, NSTimeInterval)]
     typealias GestureCollection = [GestureSample]
     
-    let gestureName: String?
+    let gestureName: String
     private var gestureBeginTime: NSTimeInterval?
     private var gestureSample = GestureSample()
     private var gestureData = GestureCollection()
@@ -29,11 +29,32 @@ class GestureRecorder {
     }
     
     class func clear() {
-        // TODO remove file
+        createDataFile(replace: true)
+    }
+    
+    private class func createDataFile(#replace: Bool) -> NSURL? {
+        let fileManager = NSFileManager.defaultManager()
+        
+        if let cacheDirectory: String = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true).last as? String,
+            let fileURL: NSURL = NSURL(fileURLWithPath: cacheDirectory, isDirectory: true)?.URLByAppendingPathComponent("data.txt")
+        {
+            if (replace || !NSFileManager.defaultManager().fileExistsAtPath(fileURL.path!)) {
+                NSFileManager.defaultManager().createFileAtPath(fileURL.path!, contents: nil, attributes: nil)
+            }
+            return fileURL
+        }
+        
+        return nil
     }
     
     func save() {
-        println("saving to file")
+        let fileManager = NSFileManager.defaultManager()
+        if let fileURL = self.dynamicType.createDataFile(replace: false) {
+            let s = gestureData.reduce("") { (stringRepresentation, gestureSample) in
+                return "\(stringRepresentation){\(gestureName)} : \(gestureSample.description)\n"
+            }            
+            s.writeToURL(fileURL, atomically: false, encoding: NSUTF8StringEncoding, error: nil)
+        }
     }
     
     func undoLastGesture() {
