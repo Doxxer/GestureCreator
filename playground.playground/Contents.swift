@@ -2,13 +2,15 @@
 
 import UIKit
 
-var a: [Int] = [1, 2];
+let x: [CGFloat] = [1.0, 2.0, 3.0]
+let y: [CGFloat] = [12.0, 22.0, 32.0]
+let t: [NSTimeInterval] = [0, 0.2, 0.32]
 
-a.removeLast()
-a
+let d = 0.427149238
 
-a.removeLast()
-a
+let data = ["class": "1", "x": x, "y": y, "t": t.map {String(format: "%.2f", $0)} ]
 
-a.removeLast()
-a
+if let j = NSJSONSerialization.dataWithJSONObject(data, options: NSJSONWritingOptions.allZeros, error: nil) {
+    let s = NSString(data: j, encoding: NSUTF8StringEncoding)
+}
+

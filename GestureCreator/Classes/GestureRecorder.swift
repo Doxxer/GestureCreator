@@ -9,15 +9,45 @@
 import Foundation
 import CoreGraphics
 
+struct GestureSample: Printable {
+    let name: String
+    var data = [CGPoint, NSTimeInterval]()
+    
+    init(name: String) {
+        self.name = name
+    }
+    
+    mutating func appendPoint(point: CGPoint, timestamp: NSTimeInterval) {
+        data.append((point, timestamp))
+    }
+    
+    mutating func clear() {
+        data.removeAll(keepCapacity: false)
+    }
+    
+    var description: String {
+        let x = data.map { $0.0.x }
+        let y = data.map { $0.0.y }
+        let t = data.map { String(format: "%.3f", $0.1) }
+        
+        let dict = ["tag": self.name, "x": x, "y": y, "t": t]
+        if let jsonData = NSJSONSerialization.dataWithJSONObject(dict, options: NSJSONWritingOptions.allZeros, error: nil),
+            let jsonString = NSString(data: jsonData, encoding: NSUTF8StringEncoding) {
+                return jsonString as String
+        }
+        
+        return ""
+    }
+}
+
 class GestureRecorder {
-    typealias GestureSample = [(CGPoint, NSTimeInterval)]
     typealias GestureCollection = [GestureSample]
     
     let gestureName: String
     private var gestureBeginTime: NSTimeInterval?
-    private var gestureSample = GestureSample()
+    private var gestureSample: GestureSample
     private var gestureData = GestureCollection()
-    private static let dataFileName = "data.txt"
+    private static let dataFileName = "data.json"
     
     static var dataFileURL: NSURL? {
         return GestureRecorder.createDataFile(replace: false)
@@ -25,6 +55,7 @@ class GestureRecorder {
     
     init(name: String) {
         gestureName = name
+        gestureSample = GestureSample(name: name)
     }
     
     var gestureSamplesCount: Int {
@@ -54,18 +85,14 @@ class GestureRecorder {
     }
     
     func save() {
-        
         let gestureDataInString = gestureData.reduce("") { (stringRepresentation, gestureSample) in
-            return "\(stringRepresentation){\(gestureName)} : \(gestureSample.description)\n"
+            return "\(stringRepresentation)\(gestureSample.description),\n"
         }
         
-        if let fileURL = GestureRecorder.dataFileURL,
-            let fileHandler = NSFileHandle(forUpdatingURL: fileURL, error: nil),
-            let data = gestureDataInString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) {
-                println("saving \(gestureName)...")
-                fileHandler.seekToEndOfFile()
-                fileHandler.writeData(gestureDataInString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
-                fileHandler.closeFile()
+        if let fileURL = GestureRecorder.dataFileURL, let fileHandler = NSFileHandle(forUpdatingURL: fileURL, error: nil), let data = gestureDataInString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) {
+            fileHandler.seekToEndOfFile()
+            fileHandler.writeData(gestureDataInString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
+            fileHandler.closeFile()
         }
     }
     
@@ -78,17 +105,17 @@ class GestureRecorder {
     func beginStrokeAtPoint(point: CGPoint, timestamp: NSTimeInterval) {
         gestureBeginTime = gestureBeginTime ?? timestamp // set begin time if it was unsetted
         let timeDifference = timestamp - gestureBeginTime!
-        gestureSample.append((point, timeDifference))
+        gestureSample.appendPoint(point, timestamp: timeDifference)
     }
     
     func continueStrokeWithPoint(point: CGPoint, timestamp: NSTimeInterval) {
         let timeDifference = timestamp - gestureBeginTime!
-        gestureSample.append((point, timeDifference))
+        gestureSample.appendPoint(point, timestamp: timeDifference)
     }
     
     func completeGesture() {
         gestureData.append(gestureSample)
-        gestureSample.removeAll(keepCapacity: false)
+        gestureSample.clear()
         gestureBeginTime = nil
     }
 }
