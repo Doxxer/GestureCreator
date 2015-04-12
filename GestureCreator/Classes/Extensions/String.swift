@@ -10,6 +10,8 @@ import Foundation
 
 extension String {
     func toDouble() -> Double? {
-        return NSNumberFormatter().numberFromString(self)?.doubleValue
+        let numberFormatter = NSNumberFormatter()
+        numberFormatter.locale = NSLocale(localeIdentifier: "en_US")
+        return numberFormatter.numberFromString(self)?.doubleValue
     }
 }

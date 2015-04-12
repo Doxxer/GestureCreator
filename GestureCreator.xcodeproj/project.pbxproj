@@ -803,6 +803,7 @@
 			<key>children</key>
 			<array>
 				<string>8D9B132F1AD4912E00E25E25</string>
+				<string>8D9B132E1AD490FD00E25E25</string>
 				<string>8D9B132D1AD490F600E25E25</string>
 				<string>8D2473381AD4837300E640E1</string>
 				<string>8D9B133A1AD49A5500E25E25</string>
@@ -889,7 +890,6 @@
 				<string>8D9B13331AD493FB00E25E25</string>
 				<string>8D9B13341AD493FB00E25E25</string>
 				<string>8D24733B1AD4840000E640E1</string>
-				<string>8D9B132E1AD490FD00E25E25</string>
 			</array>
 			<key>isa</key>
 			<string>PBXGroup</string>
@@ -906,6 +906,8 @@
 			</array>
 			<key>isa</key>
 			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Extensions</string>
 			<key>path</key>
 			<string>Extensions</string>
 			<key>sourceTree</key>
@@ -983,8 +985,6 @@
 			<string>PBXFileReference</string>
 			<key>lastKnownFileType</key>
 			<string>sourcecode.swift</string>
-			<key>name</key>
-			<string>String.swift</string>
 			<key>path</key>
 			<string>String.swift</string>
 			<key>sourceTree</key>
