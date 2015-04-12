@@ -46,7 +46,7 @@ class GestureRecorder {
     let gestureName: String
     private var gestureBeginTime: NSTimeInterval?
     private var sample: GestureSample
-    private var gestureData = GestureCollection()
+    private(set) var gestureData = GestureCollection()
     private static let dataFileName = "data.json"
     
     static var dataFileURL: NSURL? {
@@ -56,12 +56,6 @@ class GestureRecorder {
     init(name: String) {
         gestureName = name
         sample = GestureSample(name: name)
-    }
-    
-    var gestureSamplesCount: Int {
-        get {
-            return gestureData.count
-        }
     }
     
     class func clear() {

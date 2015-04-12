@@ -9,42 +9,42 @@
 import UIKit
 
 class GestureRecorderView: UIView {
-    let touchPath = UIBezierPath()
+    private var touchPathes:[UITouch:UIBezierPath] = [:]
     let touchStrokeColor = UIColor.blueColor()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        initialize()
-    }
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        initialize()
-    }
-    
-    private func initialize() {
         self.backgroundColor = UIColor.clearColor()
-        touchPath.lineWidth = 10
-        touchPath.miterLimit = 0
-        touchPath.lineCapStyle = kCGLineCapRound
     }
     
-    func moveToPoint(point: CGPoint) {
-        touchPath.moveToPoint(point)
+    func beginTouch(touch: UITouch) {
+        let newPath: (() -> UIBezierPath) = {
+            let path = UIBezierPath()
+            path.lineWidth = 10
+            path.miterLimit = 0
+            path.lineCapStyle = kCGLineCapRound
+            return path
+        }
+        touchPathes.updateValue(newPath(), forKey: touch)
+        touchPathes[touch]!.moveToPoint(touch.locationInView(self))
     }
     
-    func addLineToPoint(point: CGPoint) {
-        touchPath.addQuadCurveToPoint(point, controlPoint: point)
-        setNeedsDisplay()
+    func moveTouch(touch: UITouch) {
+        if let touchPath = touchPathes[touch] {
+            touchPath.addLineToPoint(touch.locationInView(self))
+            setNeedsDisplay()
+        }
     }
     
     func clear() {
-        touchPath.removeAllPoints()
+        touchPathes.removeAll(keepCapacity: false)
         setNeedsDisplay()
     }
-
+    
     override func drawRect(rect: CGRect) {
         touchStrokeColor.setStroke()
-        touchPath.strokeWithBlendMode(kCGBlendModeNormal, alpha: 0.2)
+        for touchPath in self.touchPathes.values {
+            touchPath.strokeWithBlendMode(kCGBlendModeNormal, alpha: 0.2)
+        }
     }
 }
