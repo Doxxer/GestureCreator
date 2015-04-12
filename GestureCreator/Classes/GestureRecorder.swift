@@ -17,8 +17,8 @@ struct GestureSample: Printable {
         self.name = name
     }
     
-    mutating func appendPoint(point: CGPoint, timestamp: NSTimeInterval) {
-        data.append((point, timestamp))
+    mutating func appendPoint(point: CGPoint, withTimestamp t: NSTimeInterval) {
+        data.append((point, t))
     }
     
     mutating func clear() {
@@ -28,7 +28,7 @@ struct GestureSample: Printable {
     var description: String {
         let x = data.map { $0.0.x }
         let y = data.map { $0.0.y }
-        let t = data.map { String(format: "%.3f", $0.1) }
+        let t = data.map { String(format: "%.3f", $0.1).toDouble()! }
         
         let dict = ["tag": self.name, "x": x, "y": y, "t": t]
         if let jsonData = NSJSONSerialization.dataWithJSONObject(dict, options: NSJSONWritingOptions.allZeros, error: nil),
@@ -45,7 +45,7 @@ class GestureRecorder {
     
     let gestureName: String
     private var gestureBeginTime: NSTimeInterval?
-    private var gestureSample: GestureSample
+    private var sample: GestureSample
     private var gestureData = GestureCollection()
     private static let dataFileName = "data.json"
     
@@ -55,7 +55,7 @@ class GestureRecorder {
     
     init(name: String) {
         gestureName = name
-        gestureSample = GestureSample(name: name)
+        sample = GestureSample(name: name)
     }
     
     var gestureSamplesCount: Int {
@@ -105,17 +105,17 @@ class GestureRecorder {
     func beginStrokeAtPoint(point: CGPoint, timestamp: NSTimeInterval) {
         gestureBeginTime = gestureBeginTime ?? timestamp // set begin time if it was unsetted
         let timeDifference = timestamp - gestureBeginTime!
-        gestureSample.appendPoint(point, timestamp: timeDifference)
+        sample.appendPoint(point, withTimestamp: timeDifference)
     }
     
     func continueStrokeWithPoint(point: CGPoint, timestamp: NSTimeInterval) {
         let timeDifference = timestamp - gestureBeginTime!
-        gestureSample.appendPoint(point, timestamp: timeDifference)
+        sample.appendPoint(point, withTimestamp: timeDifference)
     }
     
     func completeGesture() {
-        gestureData.append(gestureSample)
-        gestureSample.clear()
+        gestureData.append(sample)
+        sample.clear()
         gestureBeginTime = nil
     }
 }
