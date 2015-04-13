@@ -41,7 +41,7 @@ class Gesture : Jsonable, Printable {
         let y = data.flatMap { stroke in stroke.map { $0.0.y } }
         let t = data.flatMap { stroke in stroke.map { String(format: "%.3f", $0.1).toDouble()! } }
         
-        let dict = ["x": x, "y": y, "t": t]
+        let dict = ["tag": self.name, "x": x, "y": y, "t": t]
         if let jsonData = NSJSONSerialization.dataWithJSONObject(dict, options: NSJSONWritingOptions.allZeros, error: nil),
             let jsonString = NSString(data: jsonData, encoding: NSUTF8StringEncoding) {
                 return jsonString as String
