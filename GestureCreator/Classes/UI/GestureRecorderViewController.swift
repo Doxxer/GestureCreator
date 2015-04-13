@@ -16,12 +16,14 @@ class GestureRecorderViewController: UIViewController {
     @IBOutlet weak var gestureRecorderView: GestureRecorderView!
     private var activeTouches = Set<UITouch>()
     
+    private var file = JsonFile(fileName: "data.json")
+    
     @IBAction func startNewGesture(sender: UIBarButtonItem) {
         let alert = UIAlertController(title: "Gesture name", message: "input the name", preferredStyle: .Alert)
         alert.addTextFieldWithConfigurationHandler(nil)
         alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { [weak self] (action) -> Void in
             if let gestureName = alert.textFields![0] as? UITextField {
-                self?.gestureRecorder?.save()
+                self?.file.save(self?.gestureRecorder?.gestureData)
                 self?.gestureRecorder = GestureRecorder(name: gestureName.text)
                 self?.updateUI()
             }
@@ -37,13 +39,13 @@ class GestureRecorderViewController: UIViewController {
     
     @IBAction func clearAllGestures(sender: UIBarButtonItem) {
         self.gestureRecorder = nil
-        GestureRecorder.clear()
+        file.createFile(replace: true)
         self.updateUI()
     }
     
     @IBAction func share(sender: UIBarButtonItem) {
-        if let file = GestureRecorder.dataFileURL {
-            let activityViewController = UIActivityViewController(activityItems: [file], applicationActivities: nil)
+        if let dataFile = file.fileURL {
+            let activityViewController = UIActivityViewController(activityItems: [dataFile], applicationActivities: nil)
             self.presentViewController(activityViewController, animated: true, completion: nil)
         }
     }

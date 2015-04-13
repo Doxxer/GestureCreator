@@ -35,7 +35,7 @@ class Gesture : Jsonable, Printable {
         completedStrokes.append(activeStrokes.removeValueForKey(touch)!)
     }
     
-    var jsonRepresentation: String {
+    @objc var jsonRepresentation: String {
         let data = completedStrokes.map { $0.data }
         let x = data.flatMap { stroke in stroke.map { $0.0.x } }
         let y = data.flatMap { stroke in stroke.map { $0.0.y } }

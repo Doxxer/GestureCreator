@@ -8,6 +8,6 @@
 
 import Foundation
 
-protocol Jsonable {
+@objc protocol Jsonable {
     var jsonRepresentation: String { get }
 }

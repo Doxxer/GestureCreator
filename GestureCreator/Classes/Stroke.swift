@@ -20,20 +20,6 @@ struct Stroke: Printable {
         data.removeAll(keepCapacity: false)
     }
     
-    var jsonRepresentation: String {
-        let x = data.map { $0.0.x }
-        let y = data.map { $0.0.y }
-        let t = data.map { String(format: "%.3f", $0.1).toDouble()! }
-        
-        let dict = ["x": x, "y": y, "t": t]
-        if let jsonData = NSJSONSerialization.dataWithJSONObject(dict, options: NSJSONWritingOptions.allZeros, error: nil),
-            let jsonString = NSString(data: jsonData, encoding: NSUTF8StringEncoding) {
-                return jsonString as String
-        }
-        
-        return ""
-    }
-    
     var description: String {
         return data.description
     }

@@ -21,6 +21,7 @@
 		8DC987291ADBB0110004AEE1 /* Stroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC987281ADBB0110004AEE1 /* Stroke.swift */; };
 		8DC9872B1ADBB5180004AEE1 /* Gesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC9872A1ADBB5180004AEE1 /* Gesture.swift */; };
 		8DC9872D1ADBBA340004AEE1 /* Jsonable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC9872C1ADBBA340004AEE1 /* Jsonable.swift */; };
+		8DC9872F1ADBC3E60004AEE1 /* JsonFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC9872E1ADBC3E60004AEE1 /* JsonFile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		8DC987281ADBB0110004AEE1 /* Stroke.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stroke.swift; sourceTree = "<group>"; };
 		8DC9872A1ADBB5180004AEE1 /* Gesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gesture.swift; sourceTree = "<group>"; };
 		8DC9872C1ADBBA340004AEE1 /* Jsonable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Jsonable.swift; sourceTree = "<group>"; };
+		8DC9872E1ADBC3E60004AEE1 /* JsonFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JsonFile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +142,7 @@
 				8DC987281ADBB0110004AEE1 /* Stroke.swift */,
 				8DC9872A1ADBB5180004AEE1 /* Gesture.swift */,
 				8DC9872C1ADBBA340004AEE1 /* Jsonable.swift */,
+				8DC9872E1ADBC3E60004AEE1 /* JsonFile.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -283,6 +286,7 @@
 			files = (
 				8D24733A1AD483AA00E640E1 /* GestureRecorderView.swift in Sources */,
 				8D2473311AD45CFE00E640E1 /* GestureRecorderViewController.swift in Sources */,
+				8DC9872F1ADBC3E60004AEE1 /* JsonFile.swift in Sources */,
 				8D9B13351AD493FB00E25E25 /* DeferredActionManager.m in Sources */,
 				8DC9872B1ADBB5180004AEE1 /* Gesture.swift in Sources */,
 				8D24733C1AD4840000E640E1 /* DeferredActionManager.swift in Sources */,

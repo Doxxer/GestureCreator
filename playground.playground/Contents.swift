@@ -2,13 +2,23 @@
 
 import UIKit
 
-let a: Bool? = nil
-let b: Bool? = true
-let c: Bool? = false
-
-
-let g = c
-
-if g ?? false {
-    "yes"
+@objc protocol j {
+    var prop: String { get }
 }
+
+func foo(data: [j]?) -> [String]? {
+    if let da = data {
+        return da.map { $0.prop }
+    }
+    return nil
+}
+
+class Bar : j {
+    @objc var prop: String {
+        return "trololo"
+    }
+}
+
+let data = [Bar(), Bar(), Bar()]
+
+let q = foo(data)
