@@ -43,6 +43,7 @@ class GestureRecorderView: UIView {
     
     override func drawRect(rect: CGRect) {
         touchStrokeColor.setStroke()
+        
         for touchPath in self.touchPathes.values {
             touchPath.strokeWithBlendMode(kCGBlendModeNormal, alpha: 0.2)
         }

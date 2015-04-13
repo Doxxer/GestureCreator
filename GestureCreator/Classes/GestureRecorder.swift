@@ -7,45 +7,13 @@
 //
 
 import Foundation
-import CoreGraphics
-
-struct GestureSample: Printable {
-    let name: String
-    var data = [CGPoint, NSTimeInterval]()
-    
-    init(name: String) {
-        self.name = name
-    }
-    
-    mutating func appendPoint(point: CGPoint, withTimestamp t: NSTimeInterval) {
-        data.append((point, t))
-    }
-    
-    mutating func clear() {
-        data.removeAll(keepCapacity: false)
-    }
-    
-    var description: String {
-        let x = data.map { $0.0.x }
-        let y = data.map { $0.0.y }
-        let t = data.map { String(format: "%.3f", $0.1).toDouble()! }
-        
-        let dict = ["tag": self.name, "x": x, "y": y, "t": t]
-        if let jsonData = NSJSONSerialization.dataWithJSONObject(dict, options: NSJSONWritingOptions.allZeros, error: nil),
-            let jsonString = NSString(data: jsonData, encoding: NSUTF8StringEncoding) {
-                return jsonString as String
-        }
-        
-        return ""
-    }
-}
+import UIKit
 
 class GestureRecorder {
-    typealias GestureCollection = [GestureSample]
+    typealias GestureCollection = [Gesture]
     
     let gestureName: String
-    private var gestureBeginTime: NSTimeInterval?
-    private var sample: GestureSample
+    private var currentGesture: Gesture
     private(set) var gestureData = GestureCollection()
     private static let dataFileName = "data.json"
     
@@ -54,8 +22,8 @@ class GestureRecorder {
     }
     
     init(name: String) {
-        gestureName = name
-        sample = GestureSample(name: name)
+        self.gestureName = name
+        self.currentGesture = Gesture(name: name)
     }
     
     class func clear() {
@@ -79,8 +47,8 @@ class GestureRecorder {
     }
     
     func save() {
-        let gestureDataInString = gestureData.reduce("") { (stringRepresentation, gestureSample) in
-            return "\(stringRepresentation)\(gestureSample.description),\n"
+        let gestureDataInString = gestureData.reduce("") { (json, gestureSample) in
+            return "\(json)\(gestureSample.jsonRepresentation),\n"
         }
         
         if let fileURL = GestureRecorder.dataFileURL, let fileHandler = NSFileHandle(forUpdatingURL: fileURL, error: nil), let data = gestureDataInString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) {
@@ -90,26 +58,28 @@ class GestureRecorder {
         }
     }
     
+    func beginStrokeWithTouch(touch: UITouch) {
+        currentGesture.beginStrokeWithTouch(touch)
+    }
+    
+    func continueStrokeWithTouch(touch: UITouch) {
+        currentGesture.continueStrokeWithTouch(touch)
+    }
+    
+    func completeStrokeWithTouch(touch: UITouch) {
+        currentGesture.completeStrokeWithTouch(touch)
+    }
+    
+    func complete() {
+        gestureData.append(currentGesture)
+        currentGesture = Gesture(name: self.gestureName)
+        
+        println(gestureData.map { $0.jsonRepresentation })
+    }
+    
     func undoLastGesture() {
         if (self.gestureData.count > 0) {
             self.gestureData.removeLast()
         }
-    }
-    
-    func beginStrokeAtPoint(point: CGPoint, timestamp: NSTimeInterval) {
-        gestureBeginTime = gestureBeginTime ?? timestamp // set begin time if it was unsetted
-        let timeDifference = timestamp - gestureBeginTime!
-        sample.appendPoint(point, withTimestamp: timeDifference)
-    }
-    
-    func continueStrokeWithPoint(point: CGPoint, timestamp: NSTimeInterval) {
-        let timeDifference = timestamp - gestureBeginTime!
-        sample.appendPoint(point, withTimestamp: timeDifference)
-    }
-    
-    func completeGesture() {
-        gestureData.append(sample)
-        sample.clear()
-        gestureBeginTime = nil
     }
 }

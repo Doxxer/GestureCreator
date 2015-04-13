@@ -15,7 +15,7 @@ class GestureRecorderViewController: UIViewController {
     @IBOutlet weak var currentGesture: UIBarButtonItem!
     @IBOutlet weak var gestureRecorderView: GestureRecorderView!
     private var activeTouches = Set<UITouch>()
-
+    
     @IBAction func startNewGesture(sender: UIBarButtonItem) {
         let alert = UIAlertController(title: "Gesture name", message: "input the name", preferredStyle: .Alert)
         alert.addTextFieldWithConfigurationHandler(nil)
@@ -25,7 +25,7 @@ class GestureRecorderViewController: UIViewController {
                 self?.gestureRecorder = GestureRecorder(name: gestureName.text)
                 self?.updateUI()
             }
-        }))
+            }))
         
         self.presentViewController(alert, animated: true, completion: nil)
     }
@@ -51,10 +51,11 @@ class GestureRecorderViewController: UIViewController {
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
         self.activeTouches.unionInPlace(touches as! Set<UITouch>)
         deferredActionManager.removeActionForKey(kStopRecordingGestureAction)
-
+        
         for touch in filter(self.activeTouches, { $0.phase == UITouchPhase.Began }) {
+            gestureRecorder?.beginStrokeWithTouch(touch)
             gestureRecorderView.beginTouch(touch)
-            gestureRecorder?.beginStrokeAtPoint(touch.locationInView(gestureRecorderView?.window), timestamp: touch.timestamp)
+            
         }
     }
     
@@ -62,26 +63,24 @@ class GestureRecorderViewController: UIViewController {
         deferredActionManager.removeActionForKey(kStopRecordingGestureAction)
         
         for touch in filter(self.activeTouches, { $0.phase == UITouchPhase.Moved }) {
-            gestureRecorder?.continueStrokeWithPoint(touch.locationInView(gestureRecorderView?.window), timestamp: touch.timestamp)
+            gestureRecorder?.continueStrokeWithTouch(touch)
             gestureRecorderView.moveTouch(touch)
         }
     }
     
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
+        for touch in filter(self.activeTouches, { $0.phase == UITouchPhase.Ended }) {
+            self.gestureRecorder?.completeStrokeWithTouch(touch)
+        }
         self.activeTouches.subtractInPlace(touches as! Set<UITouch>)
         
         deferredActionManager.performActionAfterDelay(1.0, withKey: kStopRecordingGestureAction) { [weak self] in
             if self?.activeTouches.isEmpty ?? false {
+                self?.gestureRecorder?.complete()
                 self?.gestureRecorderView?.clear()
-                self?.gestureRecorder?.completeGesture()
                 self?.updateUI()
             }
         }
-    }
-    
-    override func touchesCancelled(touches: Set<NSObject>!, withEvent event: UIEvent!) {
-        self.gestureRecorderView?.clear()
-        gestureRecorder?.completeGesture()
     }
     
     private func updateUI() {
