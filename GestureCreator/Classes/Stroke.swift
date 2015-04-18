@@ -10,7 +10,13 @@ import Foundation
 import UIKit
 
 struct Stroke: Printable {
-    private (set) var data = [CGPoint, NSTimeInterval]()
+    private (set) var data: [(CGPoint, NSTimeInterval)]
+    private (set) var id: Int
+    
+    init(ID: Int) {
+        self.data = []
+        self.id = ID
+    }
     
     mutating func appendPoint(point: CGPoint, withTimestamp t: NSTimeInterval) {
         data.append((point, t))
